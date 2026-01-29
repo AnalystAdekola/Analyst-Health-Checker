@@ -4,7 +4,7 @@ from google.genai import types
 import io
 
 # --- 1. CONFIG & SAFETY ---
-st.set_page_config(page_title="HealthAssist AI", page_icon="🏥", layout="wide")
+st.set_page_config(page_title="Analyst Health Checker", page_icon="🏥", layout="wide")
 
 # Custom CSS for UI
 st.markdown("""
@@ -105,4 +105,5 @@ if prompt := st.chat_input("Describe your symptoms or ask about your lab report.
             st.markdown('<div class="emergency-banner">🚨 IMMEDIATE ACTION REQUIRED: Please proceed to the nearest Emergency Room or call 112.</div>', unsafe_allow_html=True)
         
         st.markdown(response.text)
+
         st.session_state.messages.append({"role": "assistant", "content": response.text})
