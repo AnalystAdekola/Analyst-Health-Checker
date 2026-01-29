@@ -108,3 +108,47 @@ if prompt := st.chat_input("Describe your symptoms or ask about your lab report.
 
         st.session_state.messages.append({"role": "assistant", "content": response.text})
 
+# --- 5. LOGIC FOR ANALYST (Text or Vision) ---
+if prompt := st.chat_input("Explain your symptoms to the Analyst..."):
+    # 1. Add user message to history
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    with st.chat_message("assistant"):
+        # 2. Prepare the payload
+        # If no image is uploaded, 'input_data' is just the text prompt.
+        input_data = [prompt]
+        
+        if uploaded_file:
+            try:
+                img = PIL.Image.open(uploaded_file)
+                input_data.append(img)
+            except Exception as e:
+                st.warning("⚠️ Image detected but couldn't be read. Proceeding with text analysis.")
+
+        try:
+            # 3. Request analysis from Gemini
+            # We use the current input + the System Instruction for context
+            response = client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=input_data,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_INSTRUCTION,
+                    temperature=0.7
+                )
+            )
+            
+            output_text = response.text
+            
+            # 4. Emergency UI Logic
+            if "EMERGENCY" in output_text.upper():
+                st.markdown('<div class="emergency-banner">🚨 EMERGENCY DETECTED: PLEASE SEEK IMMEDIATE MEDICAL ATTENTION.</div>', unsafe_allow_html=True)
+            
+            st.markdown(output_text)
+            
+            # 5. Save for history
+            st.session_state.messages.append({"role": "assistant", "content": output_text})
+
+        except Exception as e:
+            st.error(f"📡 System Error: The Analyst is temporarily unavailable. ({str(e)[:50]}...)")
