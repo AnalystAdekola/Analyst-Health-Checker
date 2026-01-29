@@ -81,33 +81,6 @@ for msg in st.session_state.messages:
         st.markdown(msg["content"])
 
 # User Interaction
-if prompt := st.chat_input("Describe your symptoms or ask about your lab report..."):
-    
-    # If a file is uploaded, we prepend that context to the user's message
-    full_prompt = prompt
-    if uploaded_file:
-        full_prompt = f"[User has uploaded a lab report/document]. User Question: {prompt}"
-
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    with st.chat_message("assistant"):
-        # We pass the instruction and the messages to Gemini
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=st.session_state.messages,
-            config=types.GenerateContentConfig(system_instruction=SYSTEM_INSTRUCTION)
-        )
-        
-        # Check for Emergency Red Flags
-        if "EMERGENCY" in response.text.upper():
-            st.markdown('<div class="emergency-banner">🚨 IMMEDIATE ACTION REQUIRED: Please proceed to the nearest Emergency Room or call 112.</div>', unsafe_allow_html=True)
-        
-        st.markdown(response.text)
-
-        st.session_state.messages.append({"role": "assistant", "content": response.text})
-
 # --- 5. LOGIC FOR ANALYST (Text or Vision) ---
 if prompt := st.chat_input("Explain your symptoms to the Analyst..."):
     # 1. Add user message to history
@@ -152,3 +125,4 @@ if prompt := st.chat_input("Explain your symptoms to the Analyst..."):
 
         except Exception as e:
             st.error(f"📡 System Error: The Analyst is temporarily unavailable. ({str(e)[:50]}...)")
+
