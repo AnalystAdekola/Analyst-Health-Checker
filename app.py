@@ -69,7 +69,7 @@ Current User Location: {user_state}, Nigeria.
 """
 
 # --- 4. MAIN CHAT UI ---
-st.title("🚀 HealthAssist Triage Bot")
+st.title("🚀 Analyst Health Checker Bot")
 st.write(f"📍 Currently providing guidance for: **{user_state}**")
 
 if "messages" not in st.session_state:
@@ -107,3 +107,4 @@ if prompt := st.chat_input("Describe your symptoms or ask about your lab report.
         st.markdown(response.text)
 
         st.session_state.messages.append({"role": "assistant", "content": response.text})
+
